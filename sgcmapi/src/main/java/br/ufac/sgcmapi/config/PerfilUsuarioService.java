@@ -12,7 +12,7 @@ public class PerfilUsuarioService implements UserDetailsService {
 
     private final UsuarioService servico;
 
-    public PerfilUsuarioService(UsuarioService servico){
+    public PerfilUsuarioService(UsuarioService servico) {
         this.servico = servico;
     }
 
