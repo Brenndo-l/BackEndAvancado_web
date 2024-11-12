@@ -24,7 +24,8 @@ public class Seguranca {
     private final TokenFilter tokenFilter;
 
     public Seguranca(
-            PerfilUsuarioService perfilUsuarioService, TokenFilter tokenFilter) {
+            PerfilUsuarioService perfilUsuarioService,
+            TokenFilter tokenFilter) {
         this.perfilUsuarioService = perfilUsuarioService;
         this.tokenFilter = tokenFilter;
     }
@@ -63,12 +64,13 @@ public class Seguranca {
 
         http.authorizeHttpRequests(
             authorize -> authorize
-                .requestMatchers(HttpMethod.POST, "/autenticacao").permitAll()
+                .requestMatchers(HttpMethod.POST,"/autenticacao").permitAll()
                 .requestMatchers("/config/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );
-        http.addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
+        http.addFilterBefore(tokenFilter,
+         UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
 
