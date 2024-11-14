@@ -1,5 +1,6 @@
 package br.ufac.sgcmapi.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.ufac.sgcmapi.controller.dto.UsuarioDto;
 import br.ufac.sgcmapi.model.Usuario;
 import br.ufac.sgcmapi.service.UsuarioService;
 
@@ -28,9 +30,17 @@ public class UsuarioController implements ICrudController<Usuario> {
 
     @Override
     @GetMapping("/consultar")
-    public ResponseEntity<List<Usuario>> get(@RequestParam(required = false) String termoBusca) {
+    public ResponseEntity<List<UsuarioDto>> get(@RequestParam(required = false) String termoBusca) {
         var registros = servico.get(termoBusca);
-        return ResponseEntity.ok(registros);
+        var  dtos = new ArrayList<UsuarioDto>();
+        for (Usuario item : registros) {
+            dtos.add(new UsuarioDto(item.getId(),
+             item.getNomeCompleto(), 
+             item.getNomeUsuario(), 
+             item.getPapel().name(), 
+             item.isAtivo()));
+        }
+        return ResponseEntity.ok(dtos);
     }
 
     @Override
