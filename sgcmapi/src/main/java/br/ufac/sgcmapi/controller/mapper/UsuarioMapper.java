@@ -6,11 +6,12 @@ import org.mapstruct.Mapping;
 import br.ufac.sgcmapi.controller.dto.UsuarioDto;
 import br.ufac.sgcmapi.model.Usuario;
 
-@Mapper(componentModel= "spring")
+@Mapper(componentModel = "spring")
 public interface UsuarioMapper {
-    
-    UsuarioDto tDto(Usuario usuario);
 
-    @Mapping(target = "senha", ignore=true)
+    UsuarioDto toDto(Usuario usuario);
+
+    @Mapping(target = "senha", ignore = true)
     Usuario toEntity(UsuarioDto dto);
+    
 }

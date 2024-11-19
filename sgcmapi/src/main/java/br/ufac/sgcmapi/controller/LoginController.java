@@ -23,42 +23,46 @@ public class LoginController {
     private final UsuarioService usuarioService;
     private final TokenService tokenService;
 
-    
-    public LoginController
-    (AuthenticationManager authManager,
-    UsuarioService usuarioService, 
-    TokenService tokenService){
+    public LoginController(
+            AuthenticationManager authManager,
+            UsuarioService usuarioService,
+            TokenService tokenService) {
         this.authManager = authManager;
         this.usuarioService = usuarioService;
         this.tokenService = tokenService;
-
     }
 
     @PostMapping("/autenticacao")
-    public ResponseEntity<String> autenticar(@RequestBody Usuario usuario){
-        
+    public ResponseEntity<String> autenticar(@RequestBody Usuario usuario) {
+
         var loginToken = new UsernamePasswordAuthenticationToken(usuario.getNomeUsuario(), usuario.getSenha());
         var auth = authManager.authenticate(loginToken);
         PerfilUsuario principal = (PerfilUsuario) auth.getPrincipal();
 
         var usuarioAutenticado = usuarioService.getByNomeUsuario(principal.getUsername());
         var token = tokenService.criarToken(usuarioAutenticado);
-
+        
         return ResponseEntity.ok(token);
-
+        
     }
 
     @GetMapping("/renovar")
-    public ResponseEntity<String> renovar(@RequestHeader("Authorization") String authHeader){
+    public ResponseEntity<String> renovar(@RequestHeader("Authorization") String authHeader) {
+
         var token = authHeader.replace("Bearer ", "");
         var tokenDecodificado = JWT.decode(token);
-        if (tokenService.isDataLimiteExpirada(tokenDecodificado)){
+        
+        if (tokenService.isDataLimiteExpirada(tokenDecodificado)) {
             var mensagem = "Data limite de renovação expirada";
             return ResponseEntity.badRequest().body(mensagem);
         }
-        var noemUsuario = tokenDecodificado.getSubject();
-        var usuario = usuarioService.getByNomeUsuario(noemUsuario);
+
+        var nomeUsuario = tokenDecodificado.getSubject();
+        var usuario = usuarioService.getByNomeUsuario(nomeUsuario);
         var tokenNovo = tokenService.criarToken(usuario);
+
         return ResponseEntity.ok(tokenNovo);
+
     }
+    
 }

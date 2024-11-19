@@ -32,6 +32,11 @@ public class AtendimentoService implements ICrudService<Atendimento> {
 
     @Override
     public Atendimento save(Atendimento objeto) {
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return repo.save(objeto);
     }
 

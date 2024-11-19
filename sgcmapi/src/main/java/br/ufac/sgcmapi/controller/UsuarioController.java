@@ -25,7 +25,9 @@ public class UsuarioController implements ICrudController<Usuario> {
     private final UsuarioService servico;
     private final UsuarioMapper mapper;
 
-    public UsuarioController(UsuarioService servico, UsuarioMapper mapper) {
+    public UsuarioController(
+            UsuarioService servico,
+            UsuarioMapper mapper) {
         this.servico = servico;
         this.mapper = mapper;
     }
@@ -34,11 +36,15 @@ public class UsuarioController implements ICrudController<Usuario> {
     @GetMapping("/consultar")
     public ResponseEntity<List<UsuarioDto>> get(@RequestParam(required = false) String termoBusca) {
         var registros = servico.get(termoBusca);
-        // var  dtos = new ArrayList<UsuarioDto>();
-        // for (Usuario registro : registros) {
-        //     dtos.add(UsuarioDto.toDto(registro));
+        // var dtos = new ArrayList<UsuarioDto>();
+        // for (Usuario item : registros) {
+        //     dtos.add(new UsuarioDto(item.getId(),
+        //                             item.getNomeCompleto(),
+        //                             item.getNomeUsuario(),
+        //                             item.getPapel().name(),
+        //                             item.isAtivo()));
         // }
-       
+        // var dtos = registros.stream().map(item -> UsuarioDto.toDto(item)).toList();
         var dtos = registros.stream().map(mapper::toDto).toList();
         return ResponseEntity.ok(dtos);
     }
@@ -50,22 +56,24 @@ public class UsuarioController implements ICrudController<Usuario> {
         if (registro == null) {
             return ResponseEntity.notFound().build();
         }
-        var dto = UsuarioDto.toDto(registro);
+        var dto = mapper.toDto(registro);
         return ResponseEntity.ok(dto);
     }
 
     @Override
     @PostMapping("/inserir")
-    public ResponseEntity<Usuario> insert(@RequestBody Usuario objeto) {
+    public ResponseEntity<UsuarioDto> insert(@RequestBody Usuario objeto) {
         var registro = servico.save(objeto);
-        return ResponseEntity.created(null).body(registro);
+        var dto = mapper.toDto(registro);
+        return ResponseEntity.created(null).body(dto);
     }
 
     @Override
     @PutMapping("/atualizar")
-    public ResponseEntity<Usuario> update(@RequestBody Usuario objeto) {
+    public ResponseEntity<UsuarioDto> update(@RequestBody Usuario objeto) {
         var registro = servico.save(objeto);
-        return ResponseEntity.ok(registro);
+        var dto = mapper.toDto(registro);
+        return ResponseEntity.ok(dto);
     }
 
     @Override

@@ -32,9 +32,9 @@ public class UsuarioService implements ICrudService<Usuario> {
 
     @Override
     public Usuario save(Usuario objeto) {
-        if(objeto.getSenha() == null || objeto.getSenha().isBlank()){
+        if (objeto.getSenha() == null || objeto.getSenha().isBlank()) {
             var usuario = get(objeto.getId());
-            if(usuario != null){
+            if (usuario != null) {
                 objeto.setSenha(usuario.getSenha());
             }
         } else {
