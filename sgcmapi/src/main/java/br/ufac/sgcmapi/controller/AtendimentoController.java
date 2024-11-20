@@ -2,6 +2,11 @@ package br.ufac.sgcmapi.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
+import org.springframework.data.web.SortDefault.SortDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +27,7 @@ import br.ufac.sgcmapi.validator.groups.OnUpdate;
 
 @RestController
 @RequestMapping("/atendimento")
-public class AtendimentoController implements ICrudController<AtendimentoDto> {
+public class AtendimentoController implements ICrudController<AtendimentoDto>, IPageController<AtendimentoDto> {
 
     private final AtendimentoService servico;
     private final AtendimentoMapper mapper;
@@ -35,10 +40,20 @@ public class AtendimentoController implements ICrudController<AtendimentoDto> {
     }
 
     @Override
-    @GetMapping("/consultar")
+    @GetMapping("/consultar/todos")
     public ResponseEntity<List<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca) {
         var registros = servico.get(termoBusca);
         var dtos = registros.stream().map(mapper::toDto).toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    @Override
+    @GetMapping("/consultar")
+    public ResponseEntity<Page<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca, @SortDefaults({
+        @SortDefault(sort = "data", direction= Sort.Direction.ASC), 
+        @SortDefault(sort = "hora", direction= Sort.Direction.ASC)}) Pageable page) {
+        var registros = servico.get(termoBusca, page);
+        var dtos = registros.map(mapper::toDto);
         return ResponseEntity.ok(dtos);
     }
 

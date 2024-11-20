@@ -10,8 +10,8 @@ public class HorarioAtendimentoValidator implements ConstraintValidator<HorarioA
     @Override
     public boolean isValid(String hora, ConstraintValidatorContext context) {
         var localTime = LocalTime.parse(hora);
-        var limiteInicial = LocalTime.of(14, 0);
-        var limiteFinal = LocalTime.of(20, 0);
+        var limiteInicial = LocalTime.of(14, 00);
+        var limiteFinal = LocalTime.of(20, 00);
         return !localTime.isBefore(limiteInicial) && !localTime.isAfter(limiteFinal);
     }
     
