@@ -2,6 +2,7 @@ package br.ufac.sgcmapi.controller;
 
 import java.util.List;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,12 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.ufac.sgcmapi.controller.dto.AtendimentoDto;
 import br.ufac.sgcmapi.controller.mapper.AtendimentoMapper;
+import br.ufac.sgcmapi.model.RespostaErro;
 import br.ufac.sgcmapi.service.AtendimentoService;
 import br.ufac.sgcmapi.validator.groups.OnInsert;
 import br.ufac.sgcmapi.validator.groups.OnUpdate;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/atendimento")
+@Tag(name="Atendimento", description="Endpoints para gerenciar Atendimentos")
 public class AtendimentoController implements ICrudController<AtendimentoDto>, IPageController<AtendimentoDto> {
 
     private final AtendimentoService servico;
@@ -40,7 +49,11 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
     }
 
     @Override
-    @GetMapping("/consultar/todos")
+    @GetMapping(value="/consultar/todos", produces="application/json")
+    @Operation(
+        summary = "Obter todos os atendimentos ou filtrar por termo de busca (sem paginação)",
+        description="Obter uma lista de todos os atendimentos cadastrados no sistema ou que contenham o termo de busca informado."
+    )
     public ResponseEntity<List<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca) {
         var registros = servico.get(termoBusca);
         var dtos = registros.stream().map(mapper::toDto).toList();
@@ -49,9 +62,9 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
 
     @Override
     @GetMapping("/consultar")
-    public ResponseEntity<Page<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca, @SortDefaults({
-        @SortDefault(sort = "data", direction= Sort.Direction.ASC), 
-        @SortDefault(sort = "hora", direction= Sort.Direction.ASC)}) Pageable page) {
+    public ResponseEntity<Page<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca, @SortDefaults({@SortDefault(sort = "data", direction = Sort.Direction.ASC),
+    @SortDefault(sort = "hora", direction = Sort.Direction.ASC)
+    }) @ParameterObject Pageable page) {
         var registros = servico.get(termoBusca, page);
         var dtos = registros.map(mapper::toDto);
         return ResponseEntity.ok(dtos);
@@ -59,6 +72,14 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
 
     @Override
     @GetMapping("/{id}")
+    @Operation(
+        summary = "Obter um atendimento",
+        description = "Obtém um atendimento cadastrado no sistema baseado no id"
+    )
+    @ApiResponses(value= {
+        @ApiResponse(responseCode= "200", description="Atendimento encontrado"),
+        @ApiResponse(responseCode= "404", description="Atendimento não encontrado", content=@Content())
+    })
     public ResponseEntity<AtendimentoDto> get(@PathVariable Long id) {
         var registro = servico.get(id);
         if (registro == null) {
@@ -69,7 +90,11 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
     }
 
     @Override
-    @PostMapping("/inserir")
+    @PostMapping(value="/inserir", produces = "application/json")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode="201", description = "Atendimento cadastrado com sucesso"),
+        @ApiResponse(responseCode="400", description = "Dados invalidos", content=@Content(schema=@Schema(implementation=RespostaErro.class)))
+    })
     public ResponseEntity<AtendimentoDto> insert(@RequestBody @Validated(OnInsert.class) AtendimentoDto objeto) {
         var objetoConvertido = mapper.toEntity(objeto);
         // if(objetoConvertido.getData() == null){

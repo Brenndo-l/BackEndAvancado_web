@@ -5,8 +5,22 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
+
 @SpringBootApplication
 @RestController
+@Hidden
+@OpenAPIDefinition(
+	info = @Info(
+		title = "SGCM API",
+		version= "1.0",
+		description = "API do SGCM"),
+		servers={
+			@Server(url = "https://localhost:9000", description = "Ambiente de Desenvolvimento")}
+)
 public class SgcmapiApplication {
 
 	@RequestMapping("/")
