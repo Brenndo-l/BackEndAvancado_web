@@ -35,7 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/atendimento")
-@Tag(name="Atendimento", description="Endpoints para gerenciar Atendimentos")
+@Tag(name = "Atendimento", description = "Endpoints para gerenciar atendimentos")
 public class AtendimentoController implements ICrudController<AtendimentoDto>, IPageController<AtendimentoDto> {
 
     private final AtendimentoService servico;
@@ -49,10 +49,10 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
     }
 
     @Override
-    @GetMapping(value="/consultar/todos", produces="application/json")
+    @GetMapping(value = "/consultar/todos", produces = "application/json")
     @Operation(
         summary = "Obter todos os atendimentos ou filtrar por termo de busca (sem paginação)",
-        description="Obter uma lista de todos os atendimentos cadastrados no sistema ou que contenham o termo de busca informado."
+        description = "Obtém uma lista não paginada de todos os atendimentos cadastrados no sistema ou que contenham o termo de busca informado."
     )
     public ResponseEntity<List<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca) {
         var registros = servico.get(termoBusca);
@@ -62,9 +62,14 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
 
     @Override
     @GetMapping("/consultar")
-    public ResponseEntity<Page<AtendimentoDto>> get(@RequestParam(required = false) String termoBusca, @SortDefaults({@SortDefault(sort = "data", direction = Sort.Direction.ASC),
-    @SortDefault(sort = "hora", direction = Sort.Direction.ASC)
-    }) @ParameterObject Pageable page) {
+    public ResponseEntity<Page<AtendimentoDto>> get(
+            @RequestParam(required = false) String termoBusca,
+            @SortDefaults({
+                @SortDefault(sort = "data", direction = Sort.Direction.ASC),
+                @SortDefault(sort = "hora", direction = Sort.Direction.ASC)
+            })
+            @ParameterObject
+            Pageable page) {
         var registros = servico.get(termoBusca, page);
         var dtos = registros.map(mapper::toDto);
         return ResponseEntity.ok(dtos);
@@ -74,11 +79,11 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
     @GetMapping("/{id}")
     @Operation(
         summary = "Obter um atendimento",
-        description = "Obtém um atendimento cadastrado no sistema baseado no id"
+        description = "Obtém um atendimento cadastrado no sistema baseado no ID informado"
     )
-    @ApiResponses(value= {
-        @ApiResponse(responseCode= "200", description="Atendimento encontrado"),
-        @ApiResponse(responseCode= "404", description="Atendimento não encontrado", content=@Content())
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Atendimento encontrado"),
+        @ApiResponse(responseCode = "404", description = "Atendimento não encontrado", content = @Content())
     })
     public ResponseEntity<AtendimentoDto> get(@PathVariable Long id) {
         var registro = servico.get(id);
@@ -90,17 +95,16 @@ public class AtendimentoController implements ICrudController<AtendimentoDto>, I
     }
 
     @Override
-    @PostMapping(value="/inserir", produces = "application/json")
+    @PostMapping(value = "/inserir", produces = "application/json")
     @ApiResponses(value = {
-        @ApiResponse(responseCode="201", description = "Atendimento cadastrado com sucesso"),
-        @ApiResponse(responseCode="400", description = "Dados invalidos", content=@Content(schema=@Schema(implementation=RespostaErro.class)))
+        @ApiResponse(responseCode = "201", description = "Atendimento cadastrado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content(schema = @Schema(implementation = RespostaErro.class)))
     })
     public ResponseEntity<AtendimentoDto> insert(@RequestBody @Validated(OnInsert.class) AtendimentoDto objeto) {
         var objetoConvertido = mapper.toEntity(objeto);
-        // if(objetoConvertido.getData() == null){
+        // if (objetoConvertido.getData() == null) {
         //     return ResponseEntity.internalServerError().build();
         // }
-
         var registro = servico.save(objetoConvertido);
         var dto = mapper.toDto(registro);
         return ResponseEntity.created(null).body(dto);

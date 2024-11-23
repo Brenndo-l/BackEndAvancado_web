@@ -1,12 +1,13 @@
 package br.ufac.sgcmapi.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -55,7 +56,8 @@ public class Seguranca {
 
     @Bean
     @Order(1)
-    SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception{
+    SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
+
         http.securityMatcher("/v3/api-docs/**", "/v3/api-docs*", "/swagger-ui/**", "/login");
         http.formLogin(form -> form.defaultSuccessUrl("/swagger-ui/index.html"));
         http.csrf(csrf -> csrf.disable());
@@ -63,7 +65,9 @@ public class Seguranca {
         http.authorizeHttpRequests(
             authorize -> authorize.anyRequest().hasRole("ADMIN")
         );
+
         return http.build();
+
     }
 
     @Bean
@@ -80,7 +84,7 @@ public class Seguranca {
         http.authorizeHttpRequests(
             authorize -> authorize
                 .requestMatchers(HttpMethod.GET, "/").permitAll()
-                //Swagger
+                // Permitir acesso ao SWagger
                 // .requestMatchers(HttpMethod.GET, "/v3/api-docs/**", "/v3/api-docs*", "/swagger-ui/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/autenticacao").permitAll()
                 .requestMatchers("/config/**").hasRole("ADMIN")

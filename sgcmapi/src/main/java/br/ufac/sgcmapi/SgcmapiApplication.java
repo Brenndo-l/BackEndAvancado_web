@@ -2,6 +2,7 @@ package br.ufac.sgcmapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,11 +17,12 @@ import io.swagger.v3.oas.annotations.servers.Server;
 @OpenAPIDefinition(
 	info = @Info(
 		title = "SGCM API",
-		version= "1.0",
+		version = "1.0",
 		description = "API do SGCM"),
-		servers={
-			@Server(url = "https://localhost:9000", description = "Ambiente de Desenvolvimento")}
+	servers = {
+		@Server(url = "https://localhost:9000", description = "Ambiente de Desenvolvimento")}
 )
+@EnableCaching
 public class SgcmapiApplication {
 
 	@RequestMapping("/")
